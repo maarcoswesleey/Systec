@@ -2,7 +2,7 @@ body {
     background: #000 !important;
 }
 .card {
-    border: 1px solid #28a745;
+    border-radius: 20px;
 }
 .card-login {
     margin-top: 130px;
@@ -12,7 +12,6 @@ body {
 
 .card-header {
     color: #fff;
-    /*background: #ff0000;*/
     font-family: sans-serif;
     font-size: 20px;
     font-weight: 600 !important;
@@ -38,15 +37,16 @@ input:focus{
 
 .login_btn:hover{
     color: #fff;
-    background-color: #ff0000;
+    background-color: #0C1734;
+    border-color: #0C1734;
 }
 
 .btn-outline-danger {
     color: #fff;
     font-size: 18px;
-    background-color: #28a745;
+    background-color: #157E32;
     background-image: none;
-    border-color: #28a745;
+    border-color: #157E32;
 }
 
 .form-control {
@@ -59,7 +59,6 @@ input:focus{
     color: #28a745;
     background-color: transparent;
     background-clip: padding-box;
-    border: 1px solid #28a745;
     border-radius: 0;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }

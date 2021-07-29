@@ -1,3 +1,10 @@
+<?php
+
+session_start();
+require_once('conexao.php');
+
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,11 +23,23 @@
 
 
 <div class="container">
-    <div class="card card-login mx-auto text-center bg-dark">
-        <div class="card-header mx-auto bg-dark">
-            <span> <img src="https://amar.vote/assets/img/amarVotebd.png" class="w-75" alt="Logo"> </span><br/>
-                        <span class="logo_title mt-5"> Faça seu login </span>
-<!--            <h1>--><?php //echo $message?><!--</h1>-->
+    <div class="card card-login mx-auto text-center">
+        <div class="card-logo mx-auto">
+            <span> <img src="img/systec-logo.png" class="w-75" alt="Logo"> </span><br/>
+                       
+            <span class="logo_title mt-5"> Faça seu login </span>
+
+            <?php if(isset($_SESSION['nao_autenticado'])): ?>
+            
+            <p><small><small> Usuário ou senha Inválidos </small></small></p>
+
+            <?php
+                endif;
+                unset($_SESSION['nao_autenticado']);
+            ?>
+
+
+
 
         </div>
         <div class="card-body">
