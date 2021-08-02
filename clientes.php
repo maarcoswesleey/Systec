@@ -21,7 +21,6 @@ require_once('conexao.php');
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.11/jquery.mask.min.js"></script>
 
@@ -33,7 +32,7 @@ require_once('conexao.php');
 
 
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#"><big><big><i class="fa fa-arrow-left"></i></big></big></a>
+  <a class="navbar-brand" href="painel_funcionario.php"><big><big><i class="fa fa-arrow-left"></i></big></big></a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#conteudoNavbarSuportado" aria-controls="conteudoNavbarSuportado" aria-expanded="false" aria-label="Alterna navegação">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -43,8 +42,8 @@ require_once('conexao.php');
       
     </ul>
     <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fa fa-search"></i></button>
+      <input name="txtPesquisar" class="form-control mr-sm-2" type="search" placeholder="Pesquisar" aria-label="Pesquisar">
+      <button name="buttonPesquisar" class="btn btn-outline-success my-2 my-sm-0" type="submit"><i class="fa fa-search"></i></button>
     </form>
   </div>
 </nav>
@@ -80,10 +79,18 @@ require_once('conexao.php');
                   </div>
                   <div class="card-body">
                     <div class="table-responsive">
+
+                    <!-- Listar todos os clientes -->
                      
                     <?php
 
-                        $query = "SELECT * FROM clientes order by nome asc";
+                        if(isset($GET['buttonPesquisar']) and $_GET['txtPesquisar'] != ''){
+                          $nome = $_GET['txtPesquisar'] . '%';
+                          $query = "SELECT * FROM clientes WHERE nome LIKE '$nome order by nome asc";
+                          
+                        }else {
+                          $query = "SELECT * FROM clientes order by nome asc";
+                        }
 
                         $result = mysqli_query($conexao, $query);
                         //$dado = mysqli_fetch_array($result);
@@ -132,17 +139,24 @@ require_once('conexao.php');
                                 $endereco = $res_1["endereco"];
                                 $email = $res_1["email"];
                                 $cpf = $res_1["cpf"];
-                                $data = $res_1["data"];                               
+                                $data = $res_1["data"]; 
+                                $id = $res_1["id"]; 
+                                
+                                $data2 = implode('/', array_reverse(explode('-', $data)));
                         ?>
 
                         <tr>
+                          
                             <td><?php echo $nome; ?></td>
                             <td><?php echo $telefone; ?></td>
                             <td><?php echo $endereco; ?></td>
                             <td><?php echo $email; ?></td>
                             <td><?php echo $cpf; ?></td>
-                            <td><?php echo $data; ?></td>
-                            <td>Ações</td>
+                            <td><?php echo $data2; ?></td>
+                            <td>
+                              <a class="btn btn-info" href="clientes.php?func=edita&id=<?php echo $id; ?>"><i class="fa fa-pencil-square-o"></i></a>
+                              <a class="btn btn-danger" href="clientes.php?func=deleta&id=<?php echo $id; ?>"><i class="fa fa-minus-square"></i></a>
+                            </td>
                             
                         </tr>
 
@@ -246,11 +260,137 @@ if(isset($_POST['button'])) {
         echo "<script language='javascript'> window.alert('Ocorreu um erro ao cadastrar! '); </script>";
     }else {
         echo "<script language='javascript'> window.alert('Salvo com sucesso! '); </script>";
+        echo "<script language='javascript'> window.location='clientes.php'; </script>";
     }
 
 }
 
 ?>
+
+<!--EXCLUIR -->
+
+<?php 
+if(@$_GET['func'] == 'deleta') {
+  $id = $_GET['id'];
+  $query = "DELETE FROM clientes where id = '$id'";
+  mysqli_query($conexao, $query);
+  echo "<script language='javascript'> window.alert('Excluido com sucesso!'); </script>";
+  echo "<script language='javascript'> window.location='clientes.php'; </script>";
+
+}
+
+?>
+
+<!-- EDITAR -->
+
+<?php 
+if(@$_GET['func'] == 'edita') { 
+  $id = $_GET['id'];
+  $query = "SELECT * FROM clientes where id = '$id'";
+  $result = mysqli_query($conexao, $query);
+
+  while($res_1 = mysqli_fetch_array($result)){
+
+
+?>
+
+
+  <!-- Modal -->
+<div id="modalEditar" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+         <!-- Modal content-->
+        <div class="modal-content">
+                <div class="modal-header">
+                    
+                    <h4 class="modal-title">Clientes</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="id_produto">Nome</label>
+                        <input type="text" class="form-control mr-2" name="txtnome" placeholder="Nome" value="<?php echo $res_1['nome']; ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_produto">Telefone</label>
+                        <input type="text" class="form-control mr-2" name="txttelefone" id="txttelefone" placeholder="Telefone" value="<?php echo $res_1['telefone']; ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantidade">Endereço</label>
+                        <input type="text" class="form-control mr-2" name="txtendereco" placeholder="Endereço" value="<?php echo $res_1['endereco']; ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fornecedor">Email</label>
+                        <input type="email" class="form-control mr-2" name="txtemail" placeholder="Email" value="<?php echo $res_1['email']; ?>" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fornecedor">CPF</label>
+                        <input type="text" class="form-control mr-2" name="txtcpf" id="txtcpf" placeholder="CPF" value="<?php echo $res_1['cpf']; ?>" required>
+                    </div>
+                    </div>
+                        
+                    <div class="modal-footer">
+                    <button type="submit" class="btn btn-success mb-3" name="buttonEditar">Salvar </button>
+
+
+                        <button type="button" class="btn btn-danger mb-3" data-dismiss="modal">Cancelar </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>    
+
+  
+  <script> $("#modalEditar").modal("show"); </script>
+
+  <!-- Comando para editar dados Update -->
+
+  <?php
+
+if(isset($_POST['buttonEditar'])) {
+    $nome = $_POST['txtnome'];
+    $telefone = $_POST['txttelefone'];
+    $endereco = $_POST['txtendereco'];
+    $email = $_POST['txtemail'];
+    $cpf = $_POST['txtcpf'];
+
+    if ($res_1['cpf'] != $cpf) {
+
+
+    //VERIFICAR SE CPF JÁ ESTÁ CADASTRADO
+
+    $query_verificar = "SELECT * FROM clientes WHERE cpf = '{$cpf}' ";
+
+    $result_verificar = mysqli_query($conexao, $query_verificar);
+    $row_verificar = mysqli_num_rows($result_verificar);
+
+    if($row_verificar > 0) {
+        echo "<script language='javascript'> window.alert('Cliente já cadastrado para esse CPF! '); </script>";
+        exit();
+    }
+  }
+
+    $query_editar = "UPDATE clientes set nome = '$nome', telefone = '$telefone', endereco = '$endereco', email = '$email', cpf = '$cpf' WHERE id = '$id'";
+    $result_editar = mysqli_query($conexao, $query_editar);
+
+
+
+    if($result_editar == '') {
+        echo "<script language='javascript'> window.alert('Ocorreu um erro ao editar! '); </script>";
+    }else {
+        echo "<script language='javascript'> window.alert('Editado com sucesso! '); </script>";
+        echo "<script language='javascript'> window.location='clientes.php'; </script>";
+    }
+
+}
+
+
+?>
+
+<?php  } }?>
+
+
+
 
 <!--MASCARAS -->
 
